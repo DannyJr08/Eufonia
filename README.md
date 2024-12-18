@@ -4,12 +4,12 @@ Eufonia is an audio recording and analysis iOS application, helps users record v
 
 Eufonia is aimed at anyone needing to record and examine their voice characteristics, whether for practice sessions, linguistic research, or simply for better self-awareness of their vocal attributes.
 
-![Simulator Screenshot - iPhone 16 Pro - 2024-12-18 at 23 55 41](https://github.com/user-attachments/assets/540aef02-cbc4-46c2-a7ce-25ec506803b7)
+![Simulator Screenshot - iPhone 16 Pro - 2024-12-19 at 00 45 54](https://github.com/user-attachments/assets/1c564542-6527-427b-a800-97f8432ff6bd)
 
-
-![Simulator Screenshot - iPhone 16 Pro - 2024-12-18 at 23 57 46](https://github.com/user-attachments/assets/88c45333-3d6a-495c-9c5d-0febe1d12756)
+![Simulator Screenshot - iPhone 16 Pro - 2024-12-19 at 00 46 20](https://github.com/user-attachments/assets/7a44426a-9405-4092-ab02-ed3e8a7685c6)
 
 ## Features
+
 1.	Record and Save Audio Samples.
 2.	View All Recordings.
 3.	Editing and Deletion of Recordings:
