@@ -34,13 +34,13 @@ struct PredictionResultView: View {
             
             ScrollView {
                 VStack(spacing: 20) {
-                    Text("Prediction Results")
+                    Text("Results")
                         .font(.largeTitle)
                         .bold()
                         .multilineTextAlignment(.center)
                         .foregroundColor(.primary)
                         .padding(.top, 40)
-                        .accessibilityLabel("Prediction Results")
+                        .accessibilityLabel("Results")
                     
                     // Recording info card
                     VStack(alignment: .leading, spacing: 10) {
@@ -86,20 +86,20 @@ struct PredictionResultView: View {
                     
                     // Model prediction results
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Model Predictions:")
+                        Text("Estimations:")
                             .font(.headline)
                             .padding(.bottom, 5)
-                            .accessibilityLabel("Model Predictions")
+                            .accessibilityLabel("Estimations")
                         
-                        Text("🚀 Tempo Prediction: \(tempoPrediction)")
+                        Text("🚀 Tempo: \(tempoPrediction)")
                             .foregroundColor(.blue)
-                            .accessibilityLabel("Tempo Prediction: \(tempoPrediction)")
-                        Text("🎯 Pitch Prediction: \(pitchPrediction)")
+                            .accessibilityLabel("Tempo Estimation: \(tempoPrediction)")
+                        Text("🎯 Pitch: \(pitchPrediction)")
                             .foregroundColor(.green)
-                            .accessibilityLabel("Pitch Prediction: \(pitchPrediction)")
-                        Text("💥 Volume Prediction: \(rmsPrediction)")
+                            .accessibilityLabel("Pitch Estimation: \(pitchPrediction)")
+                        Text("💥 Volume: \(rmsPrediction)")
                             .foregroundColor(.red)
-                            .accessibilityLabel("Volume Prediction: \(rmsPrediction)")
+                            .accessibilityLabel("Volume Estimation: \(rmsPrediction)")
                     }
                     .padding()
                     .background(Color(UIColor.systemBackground).opacity(0.9))
