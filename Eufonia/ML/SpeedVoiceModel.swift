@@ -44,17 +44,17 @@ class SpeedVoiceModel {
             // Convertir la etiqueta en Double para hacer el switch
             switch roundedLabel {
             case 0:
-                return "Hablaste lento"
+                return "Slow speed"
             case 1:
-                return "Hablaste a una velocidad normal"
+                return "Normal speed"
             case 2:
-                return "Hablaste rápido"
+                return "Fast speed"
             default:
-                return "No se pudo determinar la velocidad"
+                return "Speed could not be determined"
             }
         } catch {
             print("Error durante la predicción: \(error)")
-            return "Error en la predicción"
+            return "Error during prediction"
         }
     }
 }

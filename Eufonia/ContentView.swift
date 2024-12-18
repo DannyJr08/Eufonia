@@ -126,15 +126,18 @@ struct ContentView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showPredictionResult) {
-                PredictionResultView(
-                    recording: selectedRecording,
-                    tempo: tempo,
-                    pitch: pitch,
-                    rms: rms,
-                    tempoPrediction: tempoPrediction,
-                    pitchPrediction: pitchPrediction,
-                    rmsPrediction: rmsPrediction
-                )
+                NavigationView {
+                    PredictionResultView(
+                        recording: selectedRecording,
+                        tempo: tempo,
+                        pitch: pitch,
+                        rms: rms,
+                        tempoPrediction: tempoPrediction,
+                        pitchPrediction: pitchPrediction,
+                        rmsPrediction: rmsPrediction
+                    )
+                    .navigationBarTitleDisplayMode(.inline)
+                }
             }
         }
         .onAppear {

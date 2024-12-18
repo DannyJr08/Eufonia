@@ -37,17 +37,17 @@ class PitchVoiceModel {
             // Retornar la predicción con etiquetas
             switch roundedLabel {
             case 0:
-                return "Hablaste con tono bajo"
+                return "Low tone"
             case 1:
-                return "Hablaste con tono normal"
+                return "Medium tone"
             case 2:
-                return "Hablaste con tono alto"
+                return "High tone"
             default:
-                return "No se pudo determinar el tono"
+                return "Tone could not be determined"
             }
         } catch {
             print("Error durante la predicción: \(error)")
-            return "Error en la predicción"
+            return "Error during prediction"
         }
     }
 }

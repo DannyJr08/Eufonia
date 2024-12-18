@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct PredictionResultView: View {
+    @Environment(\.dismiss) var dismiss // Permite cerrar la vista sheet
+    
     let recording: Recording?
     @StateObject private var audioPlayer = AudioPlayer()
     
@@ -72,7 +74,7 @@ struct PredictionResultView: View {
                             .accessibilityLabel("Tempo: \(String(format: "%.2f", tempo)) beats per minute")
                         Text("🎼 Pitch (Hz): \(String(format: "%.2f", pitch))")
                             .accessibilityLabel("Pitch: \(String(format: "%.2f", pitch)) hertz")
-                        Text("🔊 RMS (dB): \(String(format: "%.4f", rms))")
+                        Text("🔊 Volume (dB): \(String(format: "%.4f", rms))")
                             .accessibilityLabel("RMS: \(String(format: "%.4f", rms)) decibels")
                     }
                     .padding()
@@ -165,6 +167,16 @@ struct PredictionResultView: View {
                 audioPlayer.prepare(url: recording.url)
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Done") {
+                    dismiss()
+                }
+                .accessibilityLabel("Done")
+                .accessibilityHint("Double tap to close the predictions view.")
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     // Format time (seconds) to mm:ss
