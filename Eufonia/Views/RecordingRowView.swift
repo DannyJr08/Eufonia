@@ -37,6 +37,12 @@ struct RecordingRowView: View {
                 Text("Velocidad: \(recording.predictionResult)")
                     .font(.caption)
                     .foregroundColor(.blue)
+                Text("Pitch \(recording.pitch)")
+                    .font(.caption)
+                    .foregroundColor(.green)
+                Text("Volume \(recording.volumeClassification)")
+                    .font(.caption)
+                    .foregroundColor(.red)
             }
             Spacer()
             Text(recording.duration)

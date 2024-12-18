@@ -7,8 +7,6 @@
 
 import CoreML
 
-import CoreML
-
 class SpeedVoiceModel {
     private let model: SpeedVoiceTabularRegressor
     

@@ -16,28 +16,26 @@ struct ContentView: View {
     @State private var isProcessing: Bool = false
     @State private var showPredictionResult: Bool = false
     
-    // Variables para PredictionResultView
+    // Variables for PredictionResultView
     @State private var tempo: Double = 0.0
     @State private var pitch: Double = 0.0
     @State private var rms: Double = 0.0
-    @State private var tempoPrediction: String = ""
-    @State private var pitchPrediction: String = "Desconocido"
-    @State private var rmsPrediction: String = "Desconocido"
+    @State private var tempoPrediction: String = "Unknown"
+    @State private var pitchPrediction: String = "Unknown"
+    @State private var rmsPrediction: String = "Unknown"
     
-    @State private var editingRecording: Recording? = nil // Estado para edición
+    @State private var editingRecording: Recording? = nil
     @State private var showRenameAlert: Bool = false
-    @State private var newName: String = "" // Nombre nuevo temporal
+    @State private var newName: String = ""
     
-    @State private var selectedRecordings = Set<UUID>() // Para la selección múltiple
-    
-    @State private var isEditing: Bool = false // Nueva variable para controlar el modo de edición
-    
+    @State private var selectedRecordings = Set<UUID>()
+    @State private var isEditing: Bool = false
     @State private var showDeleteConfirmation: Bool = false
     
     @StateObject private var audioPlayer = AudioPlayer()
     
-    @State private var selectedRecording: Recording? // Grabación seleccionada
-    @State private var showPredictionView: Bool = false // Controla la navegación
+    @State private var selectedRecording: Recording?
+    @State private var showPredictionView: Bool = false
     
     let analyzer = AudioAnalyzer()
     let speedModel = SpeedVoiceModel()
@@ -45,7 +43,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-                // Lista de grabaciones
+                // List of recordings
                 List(selection: $selectedRecordings) {
                     ForEach(recordings) { recording in
                         RecordingRowView(
@@ -66,54 +64,68 @@ struct ContentView: View {
                                 showPredictionResult = true
                             }
                         )
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("\(recording.name). Duration: \(recording.duration). Tempo: \(recording.predictionResult). Pitch: \(recording.pitch) Hz. Volume: \(recording.volumeClassification).")
+                        .accessibilityHint("Double tap to show prediction details.")
                     }
                     .onDelete(perform: deleteAtOffsets)
                 }
                 .listStyle(PlainListStyle())
                 
-                
                 if isEditing {
                     HStack {
                         Button(action: {
-                            showDeleteConfirmation = true // Mostrar la alerta
+                            showDeleteConfirmation = true
                         }) {
-                            Label("Eliminar", systemImage: "trash")
+                            Label("Delete", systemImage: "trash")
                                 .frame(maxWidth: .infinity)
                                 .foregroundColor(.red)
-                                .opacity(selectedRecordings.isEmpty ? 0.5 : 1.0) // Cambia la opacidad según el estado
+                                .opacity(selectedRecordings.isEmpty ? 0.5 : 1.0)
                         }
-                        .disabled(selectedRecordings.isEmpty) // Deshabilita si no hay selecciones
+                        .disabled(selectedRecordings.isEmpty)
+                        .accessibilityLabel("Delete selected recordings")
+                        .accessibilityHint("Deletes the selected recordings from the list.")
                     }
                     .padding()
                     .background(Color(.systemGray6))
-                } else { Button(action: {  // Botón de grabación
-                    if isRecording {
-                        stopRecording()
-                    } else {
-                        startRecording()
+                } else if isProcessing {
+                    // Show a processing indicator
+                    ProgressView("Processing audio...")
+                        .padding()
+                        .accessibilityLabel("Processing audio")
+                        .accessibilityHint("Please wait until the analysis is complete.")
+                } else {
+                    Button(action: {
+                        if isRecording {
+                            stopRecording()
+                        } else {
+                            startRecording()
+                        }
+                    }) {
+                        Image(systemName: isRecording ? "stop.circle.fill" : "record.circle.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 80, height: 80)
+                            .foregroundColor(isRecording ? .red : .blue)
                     }
-                }) {
-                    Image(systemName: isRecording ? "stop.circle.fill" : "record.circle.fill")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 80, height: 80)
-                        .foregroundColor(isRecording ? .red : .blue)
-                }
-                .padding()
+                    .padding()
+                    .accessibilityLabel(isRecording ? "Stop recording" : "Start recording")
+                    .accessibilityHint("Double tap to start or stop recording audio.")
                 }
             }
-            .navigationTitle("Todas las Grabaciones")
+            .navigationTitle("All Recordings")
             .toolbar {
-                // Botón para activar/desactivar el modo de edición
+                // Button to enable/disable editing mode
                 Button(action: {
-                    isEditing.toggle() // Cambia entre edición y no edición
+                    isEditing.toggle()
                 }) {
-                    Text(isEditing ? "Listo" : "Editar")
+                    Text(isEditing ? "Done" : "Edit")
                 }
+                .accessibilityLabel(isEditing ? "Done editing" : "Edit recordings")
+                .accessibilityHint("Double tap to enter or exit editing mode.")
             }
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showPredictionResult) {
-                // Mostrar PredictionResultView después de predecir
                 PredictionResultView(
                     recording: selectedRecording,
                     tempo: tempo,
@@ -128,22 +140,22 @@ struct ContentView: View {
         .onAppear {
             recorder.requestMicrophoneAccess()
         }
-        .alert("Renombrar Grabación", isPresented: $showRenameAlert) {
-            TextField("Nuevo nombre", text: $newName)
-            Button("Guardar", action: saveRenamedRecording)
-            Button("Cancelar", role: .cancel) {}
+        .alert("Rename Recording", isPresented: $showRenameAlert) {
+            TextField("New name", text: $newName)
+            Button("Save", action: saveRenamedRecording)
+            Button("Cancel", role: .cancel) {}
         }
-        .alert("Confirmar eliminación", isPresented: $showDeleteConfirmation) {
-            Button("Eliminar", role: .destructive) {
-                deleteSelectedRecordings() // Borra las grabaciones seleccionadas
+        .alert("Delete confirmation", isPresented: $showDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                deleteSelectedRecordings()
             }
-            Button("Cancelar", role: .cancel) {}
+            Button("Cancel", role: .cancel) {}
         } message: {
-            Text("¿Estás seguro de que deseas eliminar las grabaciones seleccionadas?")
+            Text("Are you sure you want to delete the selected recordings?")
         }
     }
     
-    // MARK: - Funciones de grabación
+    // MARK: - Recording functions
     private func startRecording() {
         recorder.startRecording()
         isRecording = true
@@ -153,43 +165,47 @@ struct ContentView: View {
         if let url = recorder.stopRecording() {
             isProcessing = true
             
-            // Análisis del audio y predicción
+            // Audio analysis and prediction
             DispatchQueue.global(qos: .userInitiated).async {
-                // Analiza las características del audio
                 let analyzedTempo = analyzer.calculateTempo(from: url)
-                // Simulación de pitch y rms hasta implementarlos
-                let analyzedPitch = 0.0
-                let analyzedRMS = 0.0
+                let analyzedPitch = analyzer.calculatePitch(from: url)
+                let analyzedRMS = analyzer.calculateRMS(from: url)
                 
-                // Predicción usando SpeedVoiceModel
+                // Prediction using SpeedVoiceModel
                 let prediction = speedModel.predict(tempoEstimate: analyzedTempo)
                 
+                let pitchModel = PitchVoiceModel()
+                let predictionPitch = pitchModel.predict(pitchEstimate: analyzedPitch)
+                
                 DispatchQueue.main.async {
-                    // Actualizar valores para PredictionResultView
+                    // Update values for PredictionResultView
                     tempo = analyzedTempo
                     pitch = analyzedPitch
                     rms = analyzedRMS
                     tempoPrediction = prediction
+                    pitchPrediction = predictionPitch
                     
-                    let baseName = locationManager.currentLocationName // Obtener nombre basado en ubicación
+                    // Classify volume
+                    rmsPrediction = classifyVolume(db: rms)
+                    
+                    let baseName = locationManager.currentLocationName
                     let uniqueName = generateUniqueName(baseName: baseName)
                     
-                    // Agregar grabación a la lista
                     let newRecording = Recording(
                         id: UUID(),
                         name: uniqueName,
                         date: Date(),
                         duration: recorder.getRecordingDuration(url: url),
-                        predictionResult: prediction,
-                        url: url
+                        predictionResult: tempoPrediction,
+                        url: url,
+                        pitch: pitchPrediction,
+                        volumeClassification: rmsPrediction
                     )
                     recordings.append(newRecording)
                     recordings.sort { $0.date > $1.date }
                     
-                    // Asigna la nueva grabación a selectedRecording antes de mostrar la hoja
                     selectedRecording = newRecording
                     
-                    // Mostrar vista de predicción
                     showPredictionResult = true
                     isRecording = false
                     isProcessing = false
@@ -218,7 +234,6 @@ struct ContentView: View {
         }
     }
     
-    // MARK: - Funciones de Selección
     private func toggleSelection(for recording: Recording) {
         if selectedRecordings.contains(recording.id) {
             selectedRecordings.remove(recording.id)
@@ -232,18 +247,25 @@ struct ContentView: View {
         selectedRecordings.removeAll()
     }
     
-    
-    // Función para generar un nombre único si hay duplicados
     private func generateUniqueName(baseName: String) -> String {
         var name = baseName
         var counter = 1
         let existingNames = recordings.map { $0.name }
-        
-        // Agregar un sufijo numérico si el nombre ya existe
         while existingNames.contains(name) {
             name = "\(baseName) (\(counter))"
             counter += 1
         }
         return name
+    }
+    
+    func classifyVolume(db: Double) -> String {
+        switch db {
+        case let x where x < -40:
+            return "Low volume"
+        case -40...(-20):
+            return "Moderate volume"
+        default:
+            return "High volume"
+        }
     }
 }

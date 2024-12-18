@@ -14,4 +14,7 @@ struct Recording: Identifiable {
     let duration: String
     let predictionResult: String
     let url: URL
+    
+    let pitch: String
+    let volumeClassification: String
 }

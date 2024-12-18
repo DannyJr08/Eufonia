@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct PredictionResultView: View {
-    let recording: Recording? // Recibe la grabación seleccionada
+    let recording: Recording?
     @StateObject private var audioPlayer = AudioPlayer()
     
-    // Valores calculados a partir del análisis de audio
+    // Analyzed audio values
     let tempo: Double
     let pitch: Double
     let rms: Double
     
-    // Resultados de los modelos Core ML
+    // ML model results
     let tempoPrediction: String
     let pitchPrediction: String
     let rmsPrediction: String
@@ -25,7 +25,6 @@ struct PredictionResultView: View {
     
     var body: some View {
         ZStack {
-            // Fondo degradado similar a un estilo más elaborado
             LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.2)]),
                            startPoint: .topLeading,
                            endPoint: .bottomTrailing)
@@ -33,28 +32,27 @@ struct PredictionResultView: View {
             
             ScrollView {
                 VStack(spacing: 20) {
-                    // Título principal
-                    Text("Resultados de las Predicciones")
+                    Text("Prediction Results")
                         .font(.largeTitle)
                         .bold()
                         .multilineTextAlignment(.center)
                         .foregroundColor(.primary)
                         .padding(.top, 40)
+                        .accessibilityLabel("Prediction Results")
                     
-                    // Tarjeta con información de la grabación
+                    // Recording info card
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Información de la Grabación:")
+                        Text("Recording Information:")
                             .font(.headline)
                             .padding(.bottom, 5)
+                            .accessibilityLabel("Recording Information")
                         
-                        Text("📜 Nombre: \(recording?.name ?? "Desconocido")")
+                        Text("📜 Name: \(recording?.name ?? "Unknown")")
                             .font(.subheadline)
-                        Text("📅 Fecha: \(recording?.date.formatted() ?? "Desconocido")")
+                            .accessibilityLabel("Name: \(recording?.name ?? "Unknown")")
+                        Text("📅 Date: \(recording?.date.formatted() ?? "Unknown")")
                             .font(.subheadline)
-                        Text("⏱ Duración: \(recording?.duration ?? "Desconocido")")
-                            .font(.subheadline)
-                        Text("🔮 Predicción: \(recording?.predictionResult ?? "Desconocido")")
-                            .font(.subheadline)
+                            .accessibilityLabel("Date: \(recording?.date.formatted() ?? "Unknown")")
                     }
                     .padding()
                     .background(Color(UIColor.systemBackground).opacity(0.9))
@@ -63,13 +61,59 @@ struct PredictionResultView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                     
-                    // Botón de reproducción
+                    // Analyzed audio characteristics
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Analyzed Characteristics:")
+                            .font(.headline)
+                            .padding(.bottom, 5)
+                            .accessibilityLabel("Analyzed Characteristics")
+                        
+                        Text("🎶 Tempo (BPM): \(String(format: "%.2f", tempo))")
+                            .accessibilityLabel("Tempo: \(String(format: "%.2f", tempo)) beats per minute")
+                        Text("🎼 Pitch (Hz): \(String(format: "%.2f", pitch))")
+                            .accessibilityLabel("Pitch: \(String(format: "%.2f", pitch)) hertz")
+                        Text("🔊 RMS (dB): \(String(format: "%.4f", rms))")
+                            .accessibilityLabel("RMS: \(String(format: "%.4f", rms)) decibels")
+                    }
+                    .padding()
+                    .background(Color(UIColor.systemBackground).opacity(0.9))
+                    .cornerRadius(15)
+                    .shadow(radius: 5)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    
+                    // Model prediction results
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Model Predictions:")
+                            .font(.headline)
+                            .padding(.bottom, 5)
+                            .accessibilityLabel("Model Predictions")
+                        
+                        Text("🚀 Tempo Prediction: \(tempoPrediction)")
+                            .foregroundColor(.blue)
+                            .accessibilityLabel("Tempo Prediction: \(tempoPrediction)")
+                        Text("🎯 Pitch Prediction: \(pitchPrediction)")
+                            .foregroundColor(.green)
+                            .accessibilityLabel("Pitch Prediction: \(pitchPrediction)")
+                        Text("💥 Volume Prediction: \(rmsPrediction)")
+                            .foregroundColor(.red)
+                            .accessibilityLabel("Volume Prediction: \(rmsPrediction)")
+                    }
+                    .padding()
+                    .background(Color(UIColor.systemBackground).opacity(0.9))
+                    .cornerRadius(15)
+                    .shadow(radius: 5)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    
+                    Spacer()
+                    
+                    // Playback button
                     VStack {
                         Button(action: {
                             if let recording = recording {
                                 audioPlayer.play(url: recording.url, recording: recording)
                             } else {
-                                // Mostrar alerta cuando no haya grabación
                                 showNoRecordingAlert = true
                             }
                         }) {
@@ -80,20 +124,25 @@ struct PredictionResultView: View {
                                 .foregroundColor(.blue)
                                 .padding()
                         }
+                        .accessibilityLabel(audioPlayer.isPlaying ? "Stop playback" : "Play recording")
+                        .accessibilityHint("Double tap to play or stop the recording.")
                         
-                        // Barra de progreso si hay duración
+                        // Progress bar if there's duration
                         if audioPlayer.duration > 0 {
                             VStack(spacing: 10) {
                                 ProgressView(value: audioPlayer.currentTime, total: audioPlayer.duration)
                                     .accentColor(.blue)
+                                    .accessibilityLabel("Playback progress")
+                                    .accessibilityValue("\(formatTime(audioPlayer.currentTime)) elapsed out of \(formatTime(audioPlayer.duration))")
                                 
                                 HStack {
-                                    Text(formatTime(audioPlayer.currentTime)) // Tiempo transcurrido
+                                    Text(formatTime(audioPlayer.currentTime)) // Elapsed time
                                     Spacer()
-                                    Text("-\(formatTime(audioPlayer.duration - audioPlayer.currentTime))") // Tiempo restante
+                                    Text("-\(formatTime(audioPlayer.duration - audioPlayer.currentTime))") // Remaining time
                                 }
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                                .accessibilityLabel("Elapsed time: \(formatTime(audioPlayer.currentTime)), Remaining time: \(formatTime(audioPlayer.duration - audioPlayer.currentTime))")
                             }
                             .padding(.horizontal)
                             .padding(.bottom, 10)
@@ -103,62 +152,22 @@ struct PredictionResultView: View {
                             .padding(.horizontal)
                         }
                     }
-                    
-                    // Información del análisis de audio
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Características Analizadas:")
-                            .font(.headline)
-                            .padding(.bottom, 5)
-                        
-                        Text("🎶 Tempo (BPM): \(String(format: "%.2f", tempo))")
-                        Text("🎼 Pitch (Hz): \(String(format: "%.2f", pitch))")
-                        Text("🔊 RMS (db): \(String(format: "%.4f", rms))")
-                    }
-                    .padding()
-                    .background(Color(UIColor.systemBackground).opacity(0.9))
-                    .cornerRadius(15)
-                    .shadow(radius: 5)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    
-                    // Resultados de las predicciones
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Resultados de los Modelos:")
-                            .font(.headline)
-                            .padding(.bottom, 5)
-                        
-                        Text("🚀 Predicción del Tempo: \(tempoPrediction)")
-                            .foregroundColor(.blue)
-                        Text("🎯 Predicción del Pitch: \(pitchPrediction)")
-                            .foregroundColor(.green)
-                        Text("💥 Predicción del RMS: \(rmsPrediction)")
-                            .foregroundColor(.red)
-                    }
-                    .padding()
-                    .background(Color(UIColor.systemBackground).opacity(0.9))
-                    .cornerRadius(15)
-                    .shadow(radius: 5)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    
-                    Spacer(minLength: 40)
                 }
             }
         }
-        .alert("No hay grabación disponible", isPresented: $showNoRecordingAlert) {
+        .alert("No Recording Available", isPresented: $showNoRecordingAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("No se pudo reproducir nada porque no existe ninguna grabación seleccionada.")
+            Text("No recording selected to play.")
         }
         .onAppear {
-            // Preparar duración al aparecer la vista
             if let recording = recording {
                 audioPlayer.prepare(url: recording.url)
             }
         }
     }
     
-    // Función para formatear el tiempo (segundos) a mm:ss
+    // Format time (seconds) to mm:ss
     private func formatTime(_ time: Double) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
