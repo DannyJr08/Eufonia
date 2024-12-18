@@ -60,13 +60,13 @@ struct RecordingRowView: View {
             Button(role: .destructive) {
                 onDelete(recording)
             } label: {
-                Label("Eliminar", systemImage: "trash")
+                Label("Delete", systemImage: "trash")
             }
 
             Button {
                 onEdit(recording)
             } label: {
-                Label("Editar", systemImage: "pencil")
+                Label("Edit", systemImage: "pencil")
             }
             .tint(.blue)
         }
